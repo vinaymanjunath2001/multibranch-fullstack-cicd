@@ -6,16 +6,11 @@ pipeline {
         DOCKERHUB_USERNAME    = 'vinaymanjunath30'
         FRONTEND_IMAGE        = 'frontend-app'
         BACKEND_IMAGE         = 'backend-app'
+        IMAGE_TAG             = "${BUILD_NUMBER}"
         SONARQUBE_SERVER      = 'sonarqube'
     }
 
     stages {
-
-        stage('Checkout Code') {
-            steps {
-                checkout scm
-            }
-        }
 
         stage('Build') {
             agent {
@@ -29,7 +24,7 @@ pipeline {
                 sh 'jenkins/scripts/build.sh'
             }
         }
-        
+
         stage('Test') {
             agent {
                 docker {
@@ -44,6 +39,11 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
+            agent {
+                docker {
+                    image 'sonarsource/sonar-scanner-cli:latest'
+                }
+            }
             steps {
                 withSonarQubeEnv('sonarqube') {
                     sh '''
@@ -56,19 +56,31 @@ pipeline {
         }
 
         stage('Docker Image Build') {
+            agent {
+                docker {
+                    image 'docker:27-cli'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
                 sh '''
-                docker build -t ${DOCKERHUB_USERNAME}/${FRONTEND_IMAGE}:latest frontend
-                docker build -t ${DOCKERHUB_USERNAME}/${BACKEND_IMAGE}:latest backend
+                docker build -t ${DOCKERHUB_USERNAME}/${FRONTEND_IMAGE}:${IMAGE_TAG} frontend
+                docker build -t ${DOCKERHUB_USERNAME}/${BACKEND_IMAGE}:${IMAGE_TAG} backend
                 '''
             }
         }
 
         stage('Trivy Image Scan') {
+            agent {
+                docker {
+                    image 'aquasec/trivy:latest'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
                 sh '''
-                trivy image --severity HIGH,CRITICAL ${DOCKERHUB_USERNAME}/${FRONTEND_IMAGE}:latest
-                trivy image --severity HIGH,CRITICAL ${DOCKERHUB_USERNAME}/${BACKEND_IMAGE}:latest
+                trivy image --exit-code 1 --severity HIGH,CRITICAL ${DOCKERHUB_USERNAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
+                trivy image --exit-code 1 --severity HIGH,CRITICAL ${DOCKERHUB_USERNAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
                 '''
             }
         }
@@ -101,7 +113,6 @@ pipeline {
                 }
             }
         }
-
     }
 
     post {
