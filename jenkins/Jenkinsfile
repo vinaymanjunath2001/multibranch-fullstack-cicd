@@ -19,11 +19,18 @@ pipeline {
         }
 
         stage('Build') {
-            steps {
-                sh 'chmod +x jenkins/scripts/build.sh'
-                sh 'jenkins/scripts/build.sh'
+            agent {
+               docker {
+                 image 'node:18'
+                 args '-u root'
+                }
             }
+            steps {
+               sh 'chmod +x jenkins/scripts/build.sh'
+               sh 'jenkins/scripts/build.sh'
+           }
         }
+
 
         stage('Test') {
             steps {
