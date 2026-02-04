@@ -7,18 +7,11 @@ pipeline {
         FRONTEND_IMAGE        = 'frontend-app'
         BACKEND_IMAGE         = 'backend-app'
         IMAGE_TAG             = "${BUILD_NUMBER}"
-        SONARQUBE_SERVER      = 'sonarqube'
     }
 
     stages {
 
         stage('Build') {
-            agent {
-                docker {
-                    image 'node:18'
-                    args '-u root'
-                }
-            }
             steps {
                 sh 'chmod +x jenkins/scripts/build.sh'
                 sh 'jenkins/scripts/build.sh'
@@ -26,12 +19,6 @@ pipeline {
         }
 
         stage('Test') {
-            agent {
-                docker {
-                    image 'node:18'
-                    args '-u root'
-                }
-            }
             steps {
                 sh 'chmod +x jenkins/scripts/test.sh'
                 sh 'jenkins/scripts/test.sh'
@@ -39,11 +26,6 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            agent {
-                docker {
-                    image 'sonarsource/sonar-scanner-cli:latest'
-                }
-            }
             steps {
                 withSonarQubeEnv('sonarqube') {
                     sh '''
@@ -56,12 +38,6 @@ pipeline {
         }
 
         stage('Docker Image Build') {
-            agent {
-                docker {
-                    image 'docker:27-cli'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                }
-            }
             steps {
                 sh '''
                 docker build -t ${DOCKERHUB_USERNAME}/${FRONTEND_IMAGE}:${IMAGE_TAG} frontend
@@ -71,17 +47,16 @@ pipeline {
         }
 
         stage('Trivy Image Scan') {
-    steps {
-        sh '''
-        export TMPDIR=/var/jenkins_home/tmp
-        mkdir -p $TMPDIR
+            steps {
+                sh '''
+                mkdir -p /var/lib/jenkins/tmp
+                export TMPDIR=/var/lib/jenkins/tmp
 
-        /usr/local/bin/trivy image --exit-code 1 --severity CRITICAL ${DOCKERHUB_USERNAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
-        /usr/local/bin/trivy image --exit-code 1 --severity CRITICAL ${DOCKERHUB_USERNAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
-        '''
-    }
-}
-
+                trivy image --exit-code 1 --severity CRITICAL ${DOCKERHUB_USERNAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
+                trivy image --exit-code 1 --severity CRITICAL ${DOCKERHUB_USERNAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
+                '''
+            }
+        }
 
         stage('Push to DockerHub') {
             steps {
@@ -97,24 +72,20 @@ pipeline {
         }
 
         stage('Update Helm values') {
-    steps {
-        withCredentials([usernamePassword(
-            credentialsId: 'github-creds',
-            usernameVariable: 'GIT_USERNAME',
-            passwordVariable: 'GIT_TOKEN'
-        )]) {
-            withEnv([
-                'GIT_EMAIL=vinaymanjunath2001@gmail.com'
-            ]) {
-                sh '''
-                git remote set-url origin https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/vinaymanjunath2001/fullstack-devops-cicd.git
-                chmod +x jenkins/scripts/update-helm-values.sh
-                jenkins/scripts/update-helm-values.sh
-                '''
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'github-creds',
+                    usernameVariable: 'GIT_USERNAME',
+                    passwordVariable: 'GIT_TOKEN'
+                )]) {
+                    sh '''
+                    git remote set-url origin https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/vinaymanjunath2001/fullstack-devops-cicd.git
+                    chmod +x jenkins/scripts/update-helm-values.sh
+                    jenkins/scripts/update-helm-values.sh
+                    '''
+                }
             }
         }
-    }
-}
     }
 
     post {

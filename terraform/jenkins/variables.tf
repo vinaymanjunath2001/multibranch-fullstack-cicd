@@ -7,7 +7,7 @@ variable "instance_type" {
 }
 
 variable "ami_id" {
-  description = "Amazon Linux 2 AMI ID"
+  description = "Ubuntu AMI ID"
   type        = string
 }
 

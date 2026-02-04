@@ -1,29 +1,19 @@
 #!/bin/bash
 set -euo pipefail
 
-echo "=============================="
-echo "Docker Build & Push Stage"
-echo "=============================="
+echo "Logging in to DockerHub..."
 
-# Required env vars
-: "${DOCKER_USER:?Missing DOCKER_USER}"
-: "${DOCKER_PASS:?Missing DOCKER_PASS}"
-: "${DOCKERHUB_USERNAME:?Missing DOCKERHUB_USERNAME}"
-: "${BUILD_NUMBER:?Missing BUILD_NUMBER}"
+# Ensure Docker config directory exists for Jenkins user
+mkdir -p /var/lib/jenkins/.docker
+export DOCKER_CONFIG=/var/lib/jenkins/.docker
 
-FRONTEND_IMAGE="frontend-app"
-BACKEND_IMAGE="backend-app"
-IMAGE_TAG="v1.0.${BUILD_NUMBER}"
-
-echo "Logging into DockerHub"
+# Secure login (no password in command line)
 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
-echo "Building Docker images"
-docker build -t ${DOCKERHUB_USERNAME}/${FRONTEND_IMAGE}:${IMAGE_TAG} frontend
-docker build -t ${DOCKERHUB_USERNAME}/${BACKEND_IMAGE}:${IMAGE_TAG} backend
+echo "Pushing frontend image..."
+docker push "$DOCKERHUB_USERNAME/$FRONTEND_IMAGE:$IMAGE_TAG"
 
-echo "Pushing images to DockerHub"
-docker push ${DOCKERHUB_USERNAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
-docker push ${DOCKERHUB_USERNAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
+echo "Pushing backend image..."
+docker push "$DOCKERHUB_USERNAME/$BACKEND_IMAGE:$IMAGE_TAG"
 
 echo "Docker images pushed successfully"

@@ -4,57 +4,114 @@ set -e
 #################################
 # System update
 #################################
-yum update -y
+apt update -y
+apt upgrade -y
 
 #################################
-# Install Docker
+# Base dependencies
 #################################
-yum install -y docker
+apt install -y \
+  ca-certificates \
+  curl \
+  gnupg \
+  lsb-release \
+  unzip \
+  software-properties-common \
+  fontconfig
+
+#################################
+# Install Docker (for CI builds)
+#################################
+curl -fsSL https://get.docker.com | sh
 systemctl enable docker
 systemctl start docker
+usermod -aG docker ubuntu
 
 #################################
-# Allow ec2-user to run docker
+# Install Java 21 (Required for Jenkins & SonarQube)
 #################################
-usermod -aG docker ec2-user
+apt install -y openjdk-21-jre
+java -version
 
 #################################
-# Create Docker volumes
+# Install Jenkins (LATEST METHOD)
 #################################
-docker volume create jenkins_home
-docker volume create sonarqube_data
-docker volume create sonarqube_extensions
+mkdir -p /etc/apt/keyrings
+
+wget -O /etc/apt/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian/jenkins.io-2026.key
+
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc] \
+https://pkg.jenkins.io/debian binary/" \
+| tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+apt update -y
+apt install -y jenkins
+
+systemctl enable jenkins
+systemctl start jenkins
 
 #################################
-# Run Jenkins in Docker
+# Kernel tuning for SonarQube (PERSISTENT)
 #################################
-docker run -d \
-  --name jenkins \
-  --restart always \
-  -p 8080:8080 \
-  -p 50000:50000 \
-  -v jenkins_home:/var/jenkins_home \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  jenkins/jenkins:lts
+sysctl -w vm.max_map_count=524288
+sysctl -w fs.file-max=131072
+
+grep -q "vm.max_map_count" /etc/sysctl.conf || echo "vm.max_map_count=524288" >> /etc/sysctl.conf
+grep -q "fs.file-max" /etc/sysctl.conf || echo "fs.file-max=131072" >> /etc/sysctl.conf
 
 #################################
-# Run SonarQube in Docker
+# Install SonarQube (HOST BASED)
 #################################
-docker run -d \
-  --name sonarqube \
-  --restart always \
-  -p 9000:9000 \
-  -v sonarqube_data:/opt/sonarqube/data \
-  -v sonarqube_extensions:/opt/sonarqube/extensions \
-  sonarqube:lts
+useradd sonar || true
+
+cd /opt
+rm -rf sonarqube*
+
+SONAR_VERSION=10.4.1.88267
+wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-${SONAR_VERSION}.zip
+unzip sonarqube-${SONAR_VERSION}.zip
+mv sonarqube-${SONAR_VERSION} sonarqube
+
+chown -R sonar:sonar /opt/sonarqube
+chmod +x /opt/sonarqube/bin/linux-x86-64/sonar.sh
 
 #################################
-# Install Trivy on host
+# SonarQube systemd service
 #################################
-rpm -ivh https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.50.1_Linux-64bit.rpm
+cat <<EOF >/etc/systemd/system/sonarqube.service
+[Unit]
+Description=SonarQube service
+After=network.target
+
+[Service]
+Type=forking
+User=sonar
+Group=sonar
+ExecStart=/opt/sonarqube/bin/linux-x86-64/sonar.sh start
+ExecStop=/opt/sonarqube/bin/linux-x86-64/sonar.sh stop
+Restart=always
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl daemon-reexec
+systemctl enable sonarqube
+systemctl start sonarqube
+
+#################################
+# Install Trivy (ON HOST)
+#################################
+curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
+  | sh -s -- -b /usr/local/bin
 
 #################################
 # Info
 #################################
 echo "Jenkins running on port 8080"
 echo "SonarQube running on port 9000"
+echo "Docker & Trivy installed"

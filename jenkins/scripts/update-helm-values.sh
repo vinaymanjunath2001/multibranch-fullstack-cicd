@@ -14,23 +14,27 @@ VALUES_FILE="helm/fullstack-app/values.yaml"
 
 echo "Using image tag: $IMAGE_TAG"
 
-# Configure git
+# Configure git identity
 git config user.name "$GIT_USERNAME"
 git config user.email "$GIT_EMAIL"
 
-# FIX: ensure we are on main branch
-git checkout main
-git pull origin main
+# Ensure main branch exists locally (CI safe)
+git fetch origin main
+git checkout -B main origin/main
 
-# Update frontend image tag
-sed -i "s|tag: .*|tag: ${IMAGE_TAG}|g" $VALUES_FILE
+# Update ONLY the image tag (first occurrence)
+sed -i "0,/tag:/s|tag: .*|tag: ${IMAGE_TAG}|" "$VALUES_FILE"
 
-# Verify change
 echo "Updated values.yaml:"
-grep "tag:" $VALUES_FILE
+grep "tag:" "$VALUES_FILE"
 
-# Commit & push
-git add $VALUES_FILE
+# Commit only if there are changes
+if git diff --quiet; then
+  echo "No changes detected in values.yaml, skipping commit"
+  exit 0
+fi
+
+git add "$VALUES_FILE"
 git commit -m "ci: update image tag to ${IMAGE_TAG}"
 git push origin main
 
