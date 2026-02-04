@@ -10,7 +10,7 @@ frontend:
 
   image:
     repository: dockerhub_username/frontend-app
-    tag: v1.0.12
+    tag: 3
     pullPolicy: IfNotPresent
 
   service:
