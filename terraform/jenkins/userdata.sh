@@ -48,7 +48,7 @@ https://pkg.jenkins.io/debian binary/" \
 
 apt update -y
 apt install -y jenkins
-
+sudo usermod -aG docker jenkins
 systemctl enable jenkins
 systemctl start jenkins
 
@@ -128,3 +128,8 @@ curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/inst
 echo "Jenkins running on port 8080 (Java 21)"
 echo "SonarQube running on port 9000 (Java 17)"
 echo "Docker & Trivy installed"
+
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+npm install
+npm run build
