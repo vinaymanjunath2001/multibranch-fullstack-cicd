@@ -3,7 +3,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: fullstack-ingress
-  namespace: {{ .Values.global.namespace }}
+  namespace: fullstack
   labels:
     app: fullstack-app
     environment: {{ .Values.global.environment }}
