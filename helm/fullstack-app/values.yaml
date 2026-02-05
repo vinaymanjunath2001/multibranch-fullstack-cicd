@@ -9,7 +9,7 @@ frontend:
   replicaCount: 2
 
   image:
-    repository: dockerhub_username/frontend-app
+    repository: vinaymanjunath30/frontend-app
     tag: 5
     pullPolicy: IfNotPresent
 
@@ -31,7 +31,7 @@ backend:
   replicaCount: 2
 
   image:
-    repository: dockerhub_username/backend-app
+    repository: vinaymanjunath30/backend-app
     tag: v1.0.12
     pullPolicy: IfNotPresent
 
@@ -40,11 +40,11 @@ backend:
     port: 3000
 
   env:
-    DB_HOST: mysql
+    DB_HOST: mysql-db
     DB_PORT: "3306"
-    DB_NAME: appdb
-    DB_USER: appuser
-    DB_PASSWORD: apppassword
+    DB_NAME: testdb
+    DB_USER: root
+    DB_PASSWORD: pass123
 
   resources:
     requests:
