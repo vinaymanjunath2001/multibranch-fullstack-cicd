@@ -15,7 +15,7 @@ spec:
     - host: {{ .host }}
       http:
         paths:
-        {{- range .paths }}
+{{ range .paths }}
           - path: {{ .path }}
             pathType: {{ .pathType }}
             backend:
@@ -23,6 +23,6 @@ spec:
                 name: {{ .service.name }}
                 port:
                   number: {{ .service.port }}
-        {{- end }}
+{{- end }}
   {{- end }}
 {{- end }}
