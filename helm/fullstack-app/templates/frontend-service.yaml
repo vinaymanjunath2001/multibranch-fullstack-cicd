@@ -13,5 +13,5 @@ spec:
   ports:
     - name: http
       port: {{ .Values.frontend.service.port }}
-      targetPort: 80
+      targetPort: 3000
       protocol: TCP
