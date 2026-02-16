@@ -10,7 +10,7 @@ frontend:
 
   image:
     repository: vinaymanjunath30/frontend-app
-    tag: 1
+    tag: 4
     pullPolicy: IfNotPresent
 
   service:
