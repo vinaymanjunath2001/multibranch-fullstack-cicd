@@ -66,7 +66,7 @@ const createTable = () => {
 // ---------------- ROUTES ----------------
 
 // GET users
-app.get("/users", (req, res) => {
+app.get("/api/users", (req, res) => {
   con.query("SELECT * FROM apptb", (err, results) => {
     if (err) {
       console.error(err);
@@ -78,7 +78,7 @@ app.get("/users", (req, res) => {
 });
 
 // POST user
-app.post("/user", (req, res) => {
+app.post("/api/user", (req, res) => {
   con.query(
     "INSERT INTO apptb (name) VALUES (?)",
     [req.body.data],
