@@ -23,7 +23,12 @@ git fetch origin main
 git checkout -B main origin/main
 
 # Update ONLY the first occurrence of image tag
-sed -i "0,/tag:/s|tag: .*|tag: ${IMAGE_TAG}|" "$VALUES_FILE"
+#sed -i "0,/tag:/s|tag: .*|tag: ${IMAGE_TAG}|" "$VALUES_FILE"
+# Update frontend tag
+sed -i "/frontend:/,/pullPolicy:/s|tag: .*|tag: ${IMAGE_TAG}|" "$VALUES_FILE"
+
+# Update backend tag
+sed -i "/backend:/,/pullPolicy:/s|tag: .*|tag: ${IMAGE_TAG}|" "$VALUES_FILE"
 
 echo "Updated values.yaml:"
 grep "tag:" "$VALUES_FILE"
