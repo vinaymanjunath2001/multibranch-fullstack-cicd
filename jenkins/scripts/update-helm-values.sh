@@ -50,8 +50,23 @@ if git diff --quiet; then
   exit 0
 fi
 
+# Ensure we are on correct branch and up to date
+git fetch origin
+git checkout "$BRANCH_NAME"
+git pull --rebase origin "$BRANCH_NAME"
+
+# Stage only values file
 git add "$VALUES_FILE"
+
+# Commit only if changes exist
+if git diff --cached --quiet; then
+  echo "No changes detected in $VALUES_FILE, skipping commit"
+  exit 0
+fi
+
 git commit -m "ci(${BRANCH_NAME}): update image tag to ${IMAGE_TAG}"
+
+# Push updated branch
 git push origin "$BRANCH_NAME"
 
 echo "Helm values updated and pushed successfully"
