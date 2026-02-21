@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: fullstack
+  name: fullstack-prod
   labels:
     app: fullstack-app
-    environment: dev
+    environment: prod
