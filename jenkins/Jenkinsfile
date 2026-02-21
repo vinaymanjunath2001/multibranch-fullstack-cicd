@@ -103,7 +103,7 @@ pipeline {
                     passwordVariable: 'GIT_TOKEN'
                 )]) {
                     sh """
-                    git remote set-url origin https://${GIT_USERNAME}:${GIT_TOKEN}@https://github.com/vinaymanjunath2001/multibranch-fullstack-cicd.git
+                    git remote set-url origin https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/vinaymanjunath2001/multibranch-fullstack-cicd.git
                     chmod +x jenkins/scripts/update-helm-values.sh
                     BRANCH_NAME=${env.BRANCH_NAME} IMAGE_TAG=${IMAGE_TAG} jenkins/scripts/update-helm-values.sh
                     """
