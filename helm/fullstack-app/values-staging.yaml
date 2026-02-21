@@ -1,0 +1,21 @@
+global:
+  namespace: fullstack-staging
+  environment: staging
+
+frontend:
+  replicaCount: 2
+  image:
+    tag: staging-latest
+
+backend:
+  replicaCount: 2
+  image:
+    tag: staging-latest
+
+mysql:
+  persistence:
+    size: 5Gi
+
+ingress:
+  hosts:
+    - host: staging.fullstack.local

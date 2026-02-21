@@ -1,27 +1,27 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: fullstack-app
+  name: fullstack-staging
   namespace: argocd
 spec:
   project: fullstack-project
 
   source:
-    repoURL: https://github.com/vinaymanjunath2001/fullstack-devops-cicd.git
-    targetRevision: main
+    repoURL: https://github.com/vinaymanjunath2001/multibranch-fullstack-cicd.git
+    targetRevision: staging
     path: helm/fullstack-app
     helm:
       valueFiles:
         - values.yaml
-        - values-dev.yaml
+        - values-staging.yaml
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: fullstack
+    namespace: fullstack-staging
 
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=false
+      - CreateNamespace=true

@@ -1,4 +1,5 @@
 global:
+  namespace: fullstack-prod
   environment: prod
 
 frontend:

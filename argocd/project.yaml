@@ -8,11 +8,12 @@ spec:
 
   # Allowed Git repositories
   sourceRepos:
-    - https://github.com/vinaymanjunath2001/fullstack-devops-cicd.git
+    - https://github.com/vinaymanjunath2001/multibranch-fullstack-cicd.git
+
 
   # Allowed deployment destinations
   destinations:
-    - namespace: fullstack
+    - namespace: "*"
       server: https://kubernetes.default.svc
 
   # Allowed Kubernetes resources
