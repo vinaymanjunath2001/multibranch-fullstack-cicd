@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fullstack-prod
+  namespace: argocd
+spec:
+  project: fullstack-project
+
+  source:
+    repoURL: https://github.com/vinaymanjunath2001/multibranch-fullstack-cicd.git
+    targetRevision: main
+    path: helm/fullstack-app
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-prod.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: fullstack-prod
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
