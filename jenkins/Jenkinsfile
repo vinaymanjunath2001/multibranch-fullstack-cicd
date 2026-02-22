@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+    }
+
     environment {
         DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
         DOCKERHUB_USERNAME    = 'vinaymanjunath30'
@@ -9,6 +13,12 @@ pipeline {
     }
 
     stages {
+
+        stage('Cleanup Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
 
         stage('Set Environment') {
             steps {
@@ -113,6 +123,10 @@ pipeline {
     }
 
     post {
+
+        always {
+            sh 'docker image prune -f'
+        }
         success {
             echo 'CI Pipeline completed successfully'
         }
