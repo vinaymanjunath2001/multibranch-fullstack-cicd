@@ -53,6 +53,10 @@ fi
 # Ensure we are on correct branch and up to date
 git fetch origin
 git checkout "$BRANCH_NAME"
+
+git reset --hard
+git clean -fd
+
 git pull --rebase origin "$BRANCH_NAME"
 
 # Stage only values file
