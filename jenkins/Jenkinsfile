@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    options {
-        buildDiscarder(logRotator(numToKeepStr: '5'))
-        skipDefaultCheckout(false)
-    }
-
     environment {
         DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
         DOCKERHUB_USERNAME    = 'vinaymanjunath30'
@@ -15,12 +10,6 @@ pipeline {
 
     stages {
 
-        stage('Cleanup Workspace') {
-            steps {
-                cleanWs()
-                checkout scm
-            }
-        }
 
         stage('Set Environment') {
             steps {
