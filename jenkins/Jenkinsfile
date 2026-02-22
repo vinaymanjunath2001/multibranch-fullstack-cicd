@@ -3,6 +3,7 @@ pipeline {
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '5'))
+        skipDefaultCheckout(false)
     }
 
     environment {
@@ -17,6 +18,7 @@ pipeline {
         stage('Cleanup Workspace') {
             steps {
                 cleanWs()
+                checkout scm
             }
         }
 
