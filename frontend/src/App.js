@@ -55,7 +55,11 @@ function App() {
 
   return (
     <div className="App">
+<<<<<<< HEAD
       <h1>User Registration Form-staging</h1>
+=======
+      <h1>User Registration Form staging_env</h1>
+>>>>>>> dev
       <input name="input-parameter" onChange={handleChange} />
       <br />
       <br />

@@ -1,17 +1,21 @@
-ingress:
-  enabled: true
-  className: nginx
+global:
+  namespace: fullstack-dev
+  environment: dev
 
+frontend:
+  replicaCount: 1
+  image:
+    tag: dev-latest
+
+backend:
+  replicaCount: 1
+  image:
+    tag: dev-latest
+
+mysql:
+  persistence:
+    size: 2Gi
+
+ingress:
   hosts:
     - host: dev.fullstack.local
-      paths:
-        - path: /
-          pathType: Prefix
-          service:
-            name: frontend
-            port: 80
-        - path: /api
-          pathType: Prefix
-          service:
-            name: backend
-            port: 3000
