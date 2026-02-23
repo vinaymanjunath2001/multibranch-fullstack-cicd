@@ -20,5 +20,4 @@ ingress:
   enabled: true
   className: nginx
   enableCatchAll: true
-  hosts:
-    - host: fullstack.local
+  
