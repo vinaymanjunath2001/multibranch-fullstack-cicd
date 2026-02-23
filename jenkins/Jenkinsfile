@@ -29,11 +29,7 @@ pipeline {
                         ENV_NAME = 'prod'
                     }
 
-<<<<<<< HEAD
-                    IMAGE_TAG = "v1.0.${BUILD_NUMBER}-${ENV_NAME}"
-=======
                     env.IMAGE_TAG = "v1.0.${BUILD_NUMBER}-${ENV_NAME}"
->>>>>>> staging
 
                     echo "Branch: ${env.BRANCH_NAME}"
                     echo "Environment: ${ENV_NAME}"
