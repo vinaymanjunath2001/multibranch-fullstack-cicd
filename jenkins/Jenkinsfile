@@ -26,7 +26,7 @@ pipeline {
                     } else if (env.BRANCH_NAME == 'staging') {
                         ENV_NAME = 'staging'
                     } else {
-                        ENV_NAME = 'prod'
+                        ENV_NAME = 'main'
                     }
 
                     env.IMAGE_TAG = "v1.0.${BUILD_NUMBER}-${ENV_NAME}"
