@@ -90,7 +90,7 @@ ingress:
   enabled: true
   className: nginx
   hosts:
-    - host: fullstack.local
+    - host: ""
       paths:
         - path: /api
           pathType: Prefix
