@@ -17,5 +17,6 @@ mysql:
     size: 2Gi
 
 ingress:
-  hosts:
-    - host: dev.fullstack.local
+  enabled: true
+  className: nginx
+  enableCatchAll: true
