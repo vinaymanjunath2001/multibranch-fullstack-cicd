@@ -49,6 +49,6 @@ fi
 
 git add "$VALUES_FILE"
 git commit -m "ci(${BRANCH_NAME}): update image tag to ${IMAGE_TAG}"
-git push origin "$BRANCH_NAME"
+git push origin HEAD:"$BRANCH_NAME"
 
 echo "Helm values updated and pushed successfully"
