@@ -9,11 +9,6 @@ spec:
   # Allowed Git repositories
   sourceRepos:
     - https://github.com/vinaymanjunath2001/multibranch-fullstack-cicd.git
-<<<<<<< HEAD
-=======
-
->>>>>>> staging
-
   # Allowed deployment destinations
   destinations:
     - namespace: "*"
