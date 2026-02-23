@@ -1,6 +1,8 @@
 pipeline {
     agent any
 
+     options { buildDiscarder(logRotator(numToKeepStr: '5')) }
+     
     environment {
         DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
         DOCKERHUB_USERNAME    = 'vinaymanjunath30'
@@ -9,6 +11,12 @@ pipeline {
     }
 
     stages {
+        stage('Cleanup Workspace') {
+             steps {
+                 cleanWs()
+                 checkout scm
+            }
+        }
 
         stage('Set Environment') {
             steps {
@@ -21,7 +29,11 @@ pipeline {
                         ENV_NAME = 'prod'
                     }
 
+<<<<<<< HEAD
                     IMAGE_TAG = "v1.0.${BUILD_NUMBER}-${ENV_NAME}"
+=======
+                    env.IMAGE_TAG = "v1.0.${BUILD_NUMBER}-${ENV_NAME}"
+>>>>>>> staging
 
                     echo "Branch: ${env.BRANCH_NAME}"
                     echo "Environment: ${ENV_NAME}"
@@ -63,22 +75,22 @@ pipeline {
 
         stage('Docker Image Build') {
             steps {
-                sh '''
+                sh """
                 docker build -t ${DOCKERHUB_USERNAME}/${FRONTEND_IMAGE}:${IMAGE_TAG} frontend
                 docker build -t ${DOCKERHUB_USERNAME}/${BACKEND_IMAGE}:${IMAGE_TAG} backend
-                '''
+                """
             }
         }
 
         stage('Trivy Image Scan') {
             steps {
-                sh '''
+                sh """
                 mkdir -p /var/lib/jenkins/tmp
                 export TMPDIR=/var/lib/jenkins/tmp
 
                 trivy image --exit-code 1 --severity CRITICAL ${DOCKERHUB_USERNAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
                 trivy image --exit-code 1 --severity CRITICAL ${DOCKERHUB_USERNAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
-                '''
+                """
             }
         }
 
@@ -102,17 +114,21 @@ pipeline {
                     usernameVariable: 'GIT_USERNAME',
                     passwordVariable: 'GIT_TOKEN'
                 )]) {
-                    sh '''
-                    git remote set-url origin https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/vinaymanjunath2001/fullstack-devops-cicd.git
+                    sh """
+                    git remote set-url origin https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/vinaymanjunath2001/multibranch-fullstack-cicd.git
                     chmod +x jenkins/scripts/update-helm-values.sh
-                    jenkins/scripts/update-helm-values.sh
-                    '''
+                    BRANCH_NAME=${env.BRANCH_NAME} IMAGE_TAG=${IMAGE_TAG} jenkins/scripts/update-helm-values.sh
+                    """
                 }
             }
         }
     }
 
     post {
+
+        always {
+            sh 'docker image prune -f'
+        }
         success {
             echo 'CI Pipeline completed successfully'
         }
