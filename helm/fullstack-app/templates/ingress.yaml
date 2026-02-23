@@ -26,20 +26,5 @@ spec:
                   number: {{ .service.port }}
 {{- end }}
 {{- end }}
-
-  # 2️⃣ NEW: Catch-all rule (NO host)
-{{- if .Values.ingress.enableCatchAll }}
-    - http:
-        paths:
-{{- range .Values.ingress.catchAll.paths }}
-          - path: {{ .path }}
-            pathType: {{ .pathType }}
-            backend:
-              service:
-                name: {{ .service.name }}
-                port:
-                  number: {{ .service.port }}
-{{- end }}
-{{- end }}
 {{- end }}
 
