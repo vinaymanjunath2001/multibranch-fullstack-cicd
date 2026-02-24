@@ -1,23 +1,22 @@
-# Use the official Node.js 20 image as the base image
 FROM node:20-alpine
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files to the container
+# Copy only dependency files first (better caching)
 COPY package*.json ./
 
-# Install the dependencies
-RUN npm install
+# Install only production dependencies
+RUN npm ci --omit=dev
 
-# Copy the rest of the application's source code to the container
+# Copy app source
 COPY . .
 
-# Build the React.js application
+# Build React app
 RUN npm run build
 
-# Expose the port that the application listens on
+# Install lightweight static server globally once
+RUN npm install -g serve
+
 EXPOSE 3001
 
-# Start a simple web server to serve the built React.js files
-CMD [ "npx", "serve", "-s", "build" ]
+CMD ["serve", "-s", "build", "-l", "3001"]
