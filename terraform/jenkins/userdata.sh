@@ -129,5 +129,5 @@ echo "Jenkins running on port 8080 (Java 21)"
 echo "SonarQube running on port 9000 (Java 17)"
 echo "Docker & Trivy installed"
 
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-apt install -y nodejs
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
