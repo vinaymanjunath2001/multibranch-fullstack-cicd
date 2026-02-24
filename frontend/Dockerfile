@@ -1,22 +1,24 @@
-FROM node:20-alpine
+# ----------- BUILD STAGE -----------
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy only dependency files first (better caching)
 COPY package*.json ./
+RUN npm install
 
-# Install only production dependencies
-RUN npm ci --omit=dev
-
-# Copy app source
 COPY . .
-
-# Build React app
 RUN npm run build
 
-# Install lightweight static server globally once
-RUN npm install -g serve
 
-EXPOSE 3001
+# ----------- PRODUCTION STAGE -----------
+FROM nginx:alpine
 
-CMD ["serve", "-s", "build", "-l", "3001"]
+# Remove default nginx static files
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy build output from builder stage
+COPY --from=builder /app/build /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
