@@ -1,20 +1,35 @@
-# Use the official Node.js 20 image as the base image
-FROM node:20-alpine
+# ------------ BUILD STAGE ------------
+FROM node:20-alpine AS builder
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files to the container
+# Copy only dependency files first
 COPY package*.json ./
 
-# Install the dependencies
-RUN npm install
+# Install ALL deps (including dev) for build step
+RUN npm ci
 
-# Copy the rest of the application's source code to the container
+# Copy source code
 COPY . .
 
-# Expose the port that the application listens on
+# If you are using TypeScript, uncomment:
+# RUN npm run build
+
+
+# ------------ PRODUCTION STAGE ------------
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy only package files
+COPY package*.json ./
+
+# Install ONLY production dependencies
+RUN npm ci --omit=dev
+
+# Copy built app from builder
+COPY --from=builder /app ./
+
 EXPOSE 3000
 
-# Start the Node.js application
-CMD [ "npm", "start" ]
+CMD ["npm", "start"]
