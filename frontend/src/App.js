@@ -56,7 +56,7 @@ function App() {
   return (
     <div className="App">
 
-      <h1>User Registration Form prod_env</h1>
+      <h1>User Registration Form staging-env</h1>
 
       <input name="input-parameter" onChange={handleChange} />
       <br />
