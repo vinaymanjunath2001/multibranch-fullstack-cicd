@@ -5,12 +5,12 @@ global:
 frontend:
   replicaCount: 1
   image:
-    tag: v1.0.20-dev
+    tag: v1.0.3-dev
 
 backend:
   replicaCount: 1
   image:
-    tag: v1.0.20-dev
+    tag: v1.0.3-dev
 
 mysql:
   persistence:
