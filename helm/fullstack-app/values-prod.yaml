@@ -4,20 +4,41 @@ global:
 
 frontend:
   replicaCount: 3
-  image:
-    tag: v1.0.9-main
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
 
 backend:
   replicaCount: 3
-  image:
-    tag: v1.0.9-main
+  resources:
+    requests:
+      cpu: "300m"
+      memory: "512Mi"
+    limits:
+      cpu: "600m"
+      memory: "1Gi"
 
 mysql:
   persistence:
-    size: 10Gi
+    size: 20Gi
 
 ingress:
   enabled: true
   className: nginx
-  enableCatchAll: true
-  
+  hosts:
+    - host: prod.fullstack.local
+      paths:
+        - path: /api
+          pathType: Prefix
+          service:
+            name: backend
+            port: 3000
+        - path: /
+          pathType: Prefix
+          service:
+            name: frontend
+            port: 80
