@@ -89,20 +89,4 @@ mysql:
 ingress:
   enabled: true
   className: nginx
-<<<<<<< HEAD
-  hosts:
-    - host: ""
-      paths:
-        - path: /api
-          pathType: Prefix
-          service:
-            name: backend
-            port: 3000
-        - path: /
-          pathType: Prefix
-          service:
-            name: frontend
-            port: 80
-=======
   hosts: []
->>>>>>> staging
