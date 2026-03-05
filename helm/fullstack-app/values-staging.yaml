@@ -5,12 +5,12 @@ global:
 frontend:
   replicaCount: 2
   image:
-    tag: staging-latest
+    tag: v1.0.9-staging
 
 backend:
   replicaCount: 2
   image:
-    tag: staging-latest
+    tag: v1.0.9-staging
 
 mysql:
   persistence:
