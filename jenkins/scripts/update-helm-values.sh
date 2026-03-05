@@ -1,4 +1,3 @@
-#!/bin/bash
 set -e
 
 echo "=============================="
@@ -32,26 +31,23 @@ echo "Updating file: $VALUES_FILE"
 git config user.name "$GIT_USERNAME"
 git config user.email "ci-bot@jenkins.local"
 
-#git fetch origin
-git checkout "$BRANCH_NAME"
-
-#git reset --hard origin/$BRANCH_NAME
-#git clean -fd
-
-#git pull origin "$BRANCH_NAME"
-
-echo "Updating image tag to ${IMAGE_TAG}"
-
+# Update frontend image tag
 sed -i "/frontend:/,/pullPolicy:/s|tag: .*|tag: ${IMAGE_TAG}|" "$VALUES_FILE"
+
+# Update backend image tag
 sed -i "/backend:/,/pullPolicy:/s|tag: .*|tag: ${IMAGE_TAG}|" "$VALUES_FILE"
 
-git add "$VALUES_FILE"
+echo "Updated image tags in $VALUES_FILE:"
+grep "tag:" "$VALUES_FILE"
 
-if git diff --cached --quiet; then
-  echo "No changes detected"
+# Commit only if file changed
+if git diff --quiet; then
+  echo "No changes detected. Skipping commit."
   exit 0
 fi
 
+git add "$VALUES_FILE"
 git commit -m "ci(${BRANCH_NAME}): update image tag to ${IMAGE_TAG}"
+git push origin HEAD:"$BRANCH_NAME"
 
-git push origin "$BRANCH_NAME"
+echo "Helm values updated and pushed successfully"
