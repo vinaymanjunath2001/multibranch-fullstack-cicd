@@ -32,45 +32,22 @@ echo "Updating file: $VALUES_FILE"
 git config user.name "$GIT_USERNAME"
 git config user.email "ci-bot@jenkins.local"
 
-# Checkout current branch (multibranch automatically checks it out)
-git checkout "$BRANCH_NAME"
-
-# Update frontend image tag
-sed -i "/frontend:/,/pullPolicy:/s|tag: .*|tag: ${IMAGE_TAG}|" "$VALUES_FILE"
-
-# Update backend image tag
-sed -i "/backend:/,/pullPolicy:/s|tag: .*|tag: ${IMAGE_TAG}|" "$VALUES_FILE"
-
-echo "Updated image tags in $VALUES_FILE:"
-grep "tag:" "$VALUES_FILE"
-
-# Commit only if file changed
-if git diff --quiet; then
-  echo "No changes detected. Skipping commit."
-  exit 0
-fi
-
-# Ensure we are on correct branch and up to date
 git fetch origin
 git checkout "$BRANCH_NAME"
-
-git reset --hard
-git clean -fd
-
 git pull --rebase origin "$BRANCH_NAME"
 
-# Stage only values file
+echo "Updating image tag to ${IMAGE_TAG}"
+
+sed -i "/frontend:/,/pullPolicy:/s|tag: .*|tag: ${IMAGE_TAG}|" "$VALUES_FILE"
+sed -i "/backend:/,/pullPolicy:/s|tag: .*|tag: ${IMAGE_TAG}|" "$VALUES_FILE"
+
 git add "$VALUES_FILE"
 
-# Commit only if changes exist
 if git diff --cached --quiet; then
-  echo "No changes detected in $VALUES_FILE, skipping commit"
+  echo "No changes detected"
   exit 0
 fi
 
 git commit -m "ci(${BRANCH_NAME}): update image tag to ${IMAGE_TAG}"
 
-# Push updated branch
 git push origin "$BRANCH_NAME"
-
-echo "Helm values updated and pushed successfully"
