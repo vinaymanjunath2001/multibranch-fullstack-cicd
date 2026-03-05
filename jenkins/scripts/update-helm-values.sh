@@ -1,4 +1,3 @@
-#!/bin/bash
 set -e
 
 echo "=============================="
@@ -15,11 +14,11 @@ echo "Branch: $BRANCH_NAME"
 echo "Image Tag: $IMAGE_TAG"
 
 # Select correct values file based on branch
-if [ "$BRANCH_NAME" == "dev" ]; then
+if [ "$BRANCH_NAME" = "dev" ]; then
   VALUES_FILE="helm/fullstack-app/values-dev.yaml"
-elif [ "$BRANCH_NAME" == "staging" ]; then
+elif [ "$BRANCH_NAME" = "staging" ]; then
   VALUES_FILE="helm/fullstack-app/values-staging.yaml"
-elif [ "$BRANCH_NAME" == "main" ]; then
+elif [ "$BRANCH_NAME" = "main" ]; then
   VALUES_FILE="helm/fullstack-app/values-prod.yaml"
 else
   echo "Branch not configured for deployment. Skipping."
