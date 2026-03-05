@@ -30,3 +30,17 @@ ingress:
   enabled: true
   className: nginx
   enableCatchAll: true
+
+  hosts:
+    - host: prod.fullstack.local
+      paths:
+        - path: /api
+          pathType: Prefix
+          service:
+            name: backend
+            port: 3000
+        - path: /
+          pathType: Prefix
+          service:
+            name: frontend
+            port: 80
