@@ -5,25 +5,42 @@ global:
 frontend:
   replicaCount: 3
   image:
+<<<<<<< HEAD
     tag: v1.0.2-main
+=======
+    tag: prod-latest
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+>>>>>>> 064b7846 (image tag added)
 
 backend:
   replicaCount: 3
   image:
+<<<<<<< HEAD
     tag: v1.0.2-main
+=======
+    tag: prod-latest
+  resources:
+    requests:
+      cpu: "300m"
+      memory: "512Mi"
+    limits:
+      cpu: "600m"
+      memory: "1Gi"
+>>>>>>> 064b7846 (image tag added)
 
 mysql:
   persistence:
-    size: 10Gi
+    size: 20Gi
 
 ingress:
   enabled: true
   className: nginx
-  enableCatchAll: true
-<<<<<<< HEAD
-  
-=======
-
   hosts:
     - host: prod.fullstack.local
       paths:
@@ -37,4 +54,3 @@ ingress:
           service:
             name: frontend
             port: 80
->>>>>>> staging
