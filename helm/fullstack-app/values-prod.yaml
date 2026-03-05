@@ -5,7 +5,7 @@ global:
 frontend:
   replicaCount: 3
   image:
-    tag: prod-latest
+    tag: v1.0.3-main
   resources:
     requests:
       cpu: "250m"
@@ -17,7 +17,7 @@ frontend:
 backend:
   replicaCount: 3
   image:
-    tag: prod-latest
+    tag: v1.0.3-main
   resources:
     requests:
       cpu: "300m"
