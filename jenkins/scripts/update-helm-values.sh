@@ -34,7 +34,11 @@ git config user.email "ci-bot@jenkins.local"
 
 git fetch origin
 git checkout "$BRANCH_NAME"
-git pull --rebase origin "$BRANCH_NAME"
+
+git reset --hard origin/$BRANCH_NAME
+git clean -fd
+
+git pull origin "$BRANCH_NAME"
 
 echo "Updating image tag to ${IMAGE_TAG}"
 
